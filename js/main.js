@@ -1,9 +1,32 @@
-	   getWeather("./weather.php");
+function getQueryParams(qs)
+{
+	qs = qs.split("+").join(" ");
+	var params = {}, tokens,
+	re = /[?&]?([^=]+)=([^&]*)/g;
 
-	   function getWeather(link) {
-	   		$.getJSON(link, function(data){
+	while (tokens = re.exec(qs)) {
+		params[decodeURIComponent(tokens[1])]
+		= decodeURIComponent(tokens[2]);
+	}
+	return params;
+}
 
-			//console.log(data);
+function fetchWeather()
+{
+	var weatherTries = 0;
+	function tryWeather ()
+	{
+		if (weatherTries++ > 4)
+		{
+			alert('We tried to fetch your weather data, but it failed too many times.');
+			return;
+		}
+
+	var query = getQueryParams(document.location.search)["place"];
+
+	$.getJSON("http://api.openweathermap.org/data/2.5/weather?q=" + query + "&callback=?", 	function (data){
+
+			console.log(data);
 
 			//set weather id & icon 
 			var id = data.weather[0].id;
@@ -21,7 +44,7 @@
 			var sky_img = "url(./img/sky-img/" + icon + ".png)";
 			$('.bg').css('background-image', sky_img);
 
-			//console.log(icon);
+			console.log(icon);
 
 			//get weather description
 			var tempCelcius = data.main.temp - 273.15;
@@ -40,35 +63,11 @@
 
 			//initialise such doge
 			$($.doge);
+		}).fail(function(){
+			setTimeout(tryWeather, 1000);
 		});
-	   }
+	}
 
-	   	$("#browser_geo" ).one('click', function(){
-	   		getLocation();
-
-  			 function getLocation()
-			  {
-			  if (navigator.geolocation)
-			    {
-			    navigator.geolocation.getCurrentPosition(showPosition);
-			    }
-			  else
-			  	$("#browser_geo").text("Geolocation is not supported by this browser.");
-			  }
-			function showPosition(position)
-			  {
-			  //$("#browser_geo").text("Latitude: " + position.coords.latitude + 
-			  //"Longitude: " + position.coords.longitude);
-
-			  	var url = 'http://api.openweathermap.org/data/2.5/weather';
-                url += '?lat=' + position.coords.latitude + '&lon=' + position.coords.longitude + '&callback=?';
-
-                getWeather(url);
-                $("#browser_geo").text("wow, located!").css("cursor", "auto").css("color", "#FF5CFF");
-			  }
-			});
-
-
-
-
-
+	tryWeather();
+}
+fetchWeather();
