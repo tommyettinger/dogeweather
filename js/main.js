@@ -24,7 +24,7 @@ function fetchWeather()
 
 	var query = getQueryParams(document.location.search)["place"];
 
-	$.getJSON("http://api.openweathermap.org/data/2.5/weather?q=" + query + "&callback=?", 	function (data){
+	$.getJSON("http://api.openweathermap.org/data/2.5/weather?q=" + query + "&APPID=46211115e0edc4106620e3c6eda4edfa" + "&callback=?", 	function (data){
 
 			console.log(data);
 
